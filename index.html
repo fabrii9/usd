@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Obtener dirección IP, ubicación y precio del dólar por usuario usuario</h1>
+    <p id="special-price">Cargando precio especial...</p>
+  
+    <script type="text/javascript">
+      // Función para obtener la dirección IP, ubicación y precio del dólar del usuario
+      function getIPAndLocationAndDollarPrice(currencyCode, city, region) {
+        var url = 'https://openexchangerates.org/api/latest.json?app_id=1cee124a03994a0193b2cbce65922d3e&symbols=' + currencyCode;
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            var response = JSON.parse(request.responseText);
+            var price = response.rates[currencyCode];
+            // var priceTimes60 = price * 60; // Multiplica el precio por 60
+            document.getElementById('special-price').innerHTML = 'El precio del dolar para: ' + city + ', ' + region + ' es de: ' + price + ' ' + currencyCode;
+          } else {
+            console.log('Error al obtener el precio del dólar en ' + currencyCode + '.');
+          }
+        };
+        request.onerror = function () {
+          console.log('Error al conectarse con la API de Open Exchange Rates.');
+        };
+        request.send();
+      };
+  
+      // Obtener la dirección IP y la ubicación del usuario
+      fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+          // Llamar a la función para obtener el precio del dólar con el código de moneda del país del usuario
+          getIPAndLocationAndDollarPrice(data.currency, data.city, data.region);
+        })
+        .catch(error => {
+          console.log(error);
+          document.getElementById('special-price').innerHTML = 'No se pudo obtener el precio especial';
+        });
+    </script>
+</body>
+</html>
